@@ -33,6 +33,25 @@ vim.keymap.set('n', '<leader>e', '<cmd>Ex<cr>')
 
 -- PLUGIN SPECIFIC KEYMAPS --
 
+-- CELLULAR AUTOMATON
+vim.keymap.set(
+	{"n"},
+	"<leader>mir",
+	"<cmd>CellularAutomaton make_it_rain<CR>"
+)
+
+vim.keymap.set(
+	{"n"},
+	"<leader>gol",
+	"<cmd>CellularAutomaton game_of_life<CR>"
+)
+
+-- REFACTOR
+vim.keymap.set(
+    {"n", "x"},
+    "<leader>rr",
+    function() require('refactoring').select_refactor() end
+)
 -- LAZY SETUP & CONFIG --
 
 local lazy = {}
@@ -72,8 +91,21 @@ lazy.opts = {}
 
 lazy.setup({
 
+	{"tpope/vim-fugitive"},
+	{"eandrju/cellular-automaton.nvim"},
+	{
+    	"ThePrimeagen/refactoring.nvim",
+    	dependencies = {
+      		"nvim-lua/plenary.nvim",
+      		"nvim-treesitter/nvim-treesitter",
+    	},
+    	config = function()
+     		require("refactoring").setup()
+    	end,
+	},
 	{"nvim-lualine/lualine.nvim"},
 	{"nvim-treesitter/nvim-treesitter"},
+	{"nvim-treesitter/nvim-treesitter-context"},
 	{
 		"nvim-telescope/telescope.nvim",
 		dependencies = { 'nvim-lua/plenary.nvim' }
@@ -92,14 +124,64 @@ lazy.setup({
 
 -- PLUGIN CONFIG
 
-
 vim.cmd [[colorscheme moonfly]]
 vim.g.moonflyVirtualTextColor = true
+
+require('refactoring').setup({
+    -- prompt for return type
+    prompt_func_return_type = {
+        go = true,
+        cpp = true,
+        c = true,
+        java = true,
+    },
+    -- prompt for function parameters
+    prompt_func_param_type = {
+        go = true,
+        cpp = true,
+        c = true,
+        java = true,
+    },
+	show_success_message = false,
+})
+
 local lspconfig = require('lspconfig')
 local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
 
+lspconfig.cssls.setup({
+	capabilities = lsp_capabilities,
+})
+
+lspconfig.tsserver.setup({
+	capabilities = lsp_capabilities,
+})
+
 lspconfig.lua_ls.setup({
 	capabilities = lsp_capabilities,
+	settings = {
+    Lua = {
+      runtime = {
+        -- Tell the language server which version of Lua you're using
+        -- (most likely LuaJIT in the case of Neovim)
+        version = 'LuaJIT',
+      },
+      diagnostics = {
+        -- Get the language server to recognize the `vim` global
+        globals = {
+          'vim',
+          'require'
+        },
+      },
+      workspace = {
+        -- Make the server aware of Neovim runtime files
+        library = vim.api.nvim_get_runtime_file("", true),
+      },
+      -- Do not send telemetry data containing a randomized but unique identifier
+      telemetry = {
+        enable = false,
+      },
+    },
+  },
 })
 
 lspconfig.pyright.setup({
@@ -110,6 +192,9 @@ lspconfig.rust_analyzer.setup({
 	capabilities = lsp_capabilities,
 })
 
+lspconfig.clangd.setup({
+	capabilities = lsp_capabilities,
+})
 
 local cmp = require('cmp')
 local luasnip = require('luasnip')
@@ -131,9 +216,6 @@ cmp.setup({
   		documentation = cmp.config.window.bordered()
 	},
 	formatting = {
-  		fields = {'menu', 'abbr', 'kind'}
-	},
-	formatting = {
   		fields = {'menu', 'abbr', 'kind'},
   		format = function(entry, item)
     		local menu_icon = {
@@ -148,7 +230,6 @@ cmp.setup({
   		end,
 	},
 	mapping = {
-  		['<CR>'] = cmp.mapping.confirm({select = false}),
 		['<C-p>'] = cmp.mapping.select_prev_item(select_opts),
 		['<C-n>'] = cmp.mapping.select_next_item(select_opts),
 		['<C-e>'] = cmp.mapping.abort(),
