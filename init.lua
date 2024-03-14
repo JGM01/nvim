@@ -5,6 +5,8 @@
 
 
 -- OPTIONS --
+vim.opt.relativenumber = true
+vim.opt.signcolumn = "number"
 
 vim.opt.number = true		-- show numbers in gutter.
 vim.opt.ignorecase = true	-- ignore case in searches.
@@ -268,11 +270,14 @@ vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
   {border = 'rounded'}
 )
 
-require('nvim-treesitter.configs').setup({	
+require('nvim-treesitter.configs').setup({
 	  ensure_installed = { "c", "lua", "vim", "vimdoc", "typescript", "tsx","javascript", "json", "html", "css", "rust", "python" },
 	  sync_install = false,
+	  auto_install = true,
+	modules = {},
+	ignore_install = {},
 	  highlight = { enable = true },
-	  indent = { enable = true },  
+	  indent = { enable = true },
 })
 
 require('lualine').setup({
