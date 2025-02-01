@@ -73,7 +73,6 @@ return {
         })
 
         vim.diagnostic.config({
-            -- update_in_insert = true,
             float = {
                 focusable = false,
                 style = "minimal",
@@ -81,7 +80,37 @@ return {
                 source = "always",
                 header = "",
                 prefix = "",
+                width = 80,  -- Sets max width to 80 columns
+                format = function(diagnostic)
+                    -- Enable text wrapping in diagnostics float
+                    local lines = vim.split(diagnostic.message, '\n')
+                    local wrapped_lines = {}
+                    for _, line in ipairs(lines) do
+                        local wrapped = vim.fn.wrap(line, 78)  -- 78 to account for borders
+                        for _, wrapped_line in ipairs(vim.split(wrapped, '\n')) do
+                            table.insert(wrapped_lines, wrapped_line)
+                        end
+                    end
+                    return table.concat(wrapped_lines, '\n')
+                end,
+            },
+            -- Show signs in the number column
+            signs = true,
+            -- Update diagnostics in insert mode (helpful for seeing errors as you type)
+            update_in_insert = false,
+            -- Sort diagnostics by severity
+            severity_sort = true,
+            -- Customize how diagnostics are displayed inline
+            virtual_text = {
+                prefix = '●', -- Use a dot instead of the default '■'
+                spacing = 4,
+                source = "if_many",
+                severity = {
+                    min = vim.diagnostic.severity.HINT,
+                },
             },
         })
+
     end
+
 }
