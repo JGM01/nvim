@@ -4,6 +4,7 @@ vim.o.wrap = false
 vim.o.shiftwidth = 4
 vim.o.tabstop = 4
 vim.o.swapfile = false
+vim.o.winborder = "rounded"
 vim.o.background = "dark"
 vim.o.signcolumn = "yes"
 vim.o.cursorline = true
@@ -35,10 +36,9 @@ vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { noremap = true, silent = true, desc = 'Rename symbol' })
 vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { noremap = true, silent = true, desc = 'Go to definition' })
 vim.keymap.set('n', 'gr', vim.lsp.buf.references, { noremap = true, silent = true, desc = 'Go to references' })
-
+vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { noremap = true, silent = true, desc = 'Code action' })
 
 vim.pack.add({
-	{ src = "https://github.com/ellisonleao/gruvbox.nvim" },
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/typicode/bg.nvim" },
 	{ src = "https://github.com/nvim-lua/plenary.nvim" },
